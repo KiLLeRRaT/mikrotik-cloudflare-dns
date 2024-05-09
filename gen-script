@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 HOST=api.cloudflare.com
 
@@ -16,12 +17,18 @@ function dns_ids() {
 }
 
 DNS_IDS=`dns_ids`
+# echo "DNS IDs: $DNS_IDS"
+# exit 1
 
 cat <<'EOT'
 :global mcdPreviousIP;
 
 :local mcdCurrentIP
 :set mcdCurrentIP [/ip cloud get public-address]
+
+:if ($mcdCurrentIP == "") do={
+	:log error "Cloudflare DNS: IP Cloud public address is blank!!!"
+}
 
 :if ($mcdCurrentIP != $mcdPreviousIP) do={
   :log info "mcd: new IP $mcdCurrentIP (was $mcdPreviousIP)"
@@ -44,5 +51,7 @@ EOT
 done
 
 cat <<EOT
+} else={
+  :log info "Cloudflare DNS: No changes necessary."
 }
 EOT
