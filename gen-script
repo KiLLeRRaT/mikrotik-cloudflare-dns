@@ -59,7 +59,7 @@ cat <<'EOT'
 :local mcdCurrentIP
 :set mcdCurrentIP [/ip cloud get public-address]
 
-:if ($mcdCurrentIP == "") do={
+:if ($mcdCurrentIP = "") do={
 	:log error "Cloudflare DNS: IP Cloud public address is blank!!!"
 }
 
