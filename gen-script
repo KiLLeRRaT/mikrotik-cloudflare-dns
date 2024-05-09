@@ -57,9 +57,13 @@ cat <<'EOT'
 :global mcdPreviousIP;
 
 :local mcdCurrentIP
-:set mcdCurrentIP [/ip cloud get public-address]
+# :set mcdCurrentIP [/ip cloud get public-address] # THIS IS BLANK ON A FEW OF MY ROUTERS... USING
+# NEW METHOD BELOW
+:set mcdCurrentIP [:resolve myip.opendns.com server=208.67.222.222];
 
-:if ($mcdCurrentIP = "") do={
+# :if ($mcdCurrentIP = "") do={
+:if ([ :typeof $mcdCurrentIP ] = "nothing") do={
+# :if ([ :typeof $mcdCurrentIP] = "nothing" ]) do={
 	:log error "Cloudflare DNS: IP Cloud public address is blank!!!"
 }
 
