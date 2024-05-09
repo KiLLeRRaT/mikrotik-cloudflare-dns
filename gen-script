@@ -3,24 +3,57 @@ set -e
 
 HOST=api.cloudflare.com
 
+while [ "$1" != "" ]; do
+	case $1 in
+		--domain ) shift
+			export DOMAIN=$1
+			;;
+		--token ) shift
+			export TOKEN=$1
+			;;
+		--zone-id ) shift
+			export ZONE_ID=$1
+			;;
+		* ) echo "Invalid argument"
+			echo "Usage: $0 --zone-id <zone-id> --domain <domain> --token <token>"
+			exit 1
+	esac
+	shift
+done
+
+if [ -z "$ZONE_ID" ]
+then
+	echo ZONE_ID is not set. Cannot continue.
+	exit 1
+fi
+if [ -z "$DOMAIN" ]
+then
+	echo DOMAIN is not set. Cannot continue.
+	exit 2
+fi
 if [ -z "$TOKEN" ]
 then
-  echo TOKEN is not set. Cannot continue.
-  exit 2
+	echo TOKEN is not set. Cannot continue.
+	exit 3
 fi
 
 function dns_ids() {
-  curl -s "https://$HOST/client/v4/zones/$ZONE_ID/dns_records" \
-    -H "Accept: application/json" \
-    -H "Authorization: Bearer $TOKEN" \
-    | jq -r ".result[] | select(.name == (\"*.$DOMAIN\", \"$DOMAIN\")) | .id + \":\" + .name"
+	curl -s "https://$HOST/client/v4/zones/$ZONE_ID/dns_records" \
+		-H "Accept: application/json" \
+		-H "Authorization: Bearer $TOKEN" \
+		| jq -r ".result[] | select(.name == (\"*.$DOMAIN\", \"$DOMAIN\")) | .id + \":\" + .name"
 }
 
 DNS_IDS=`dns_ids`
-# echo "DNS IDs: $DNS_IDS"
-# exit 1
 
 cat <<'EOT'
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
+# GENERATED LOCATED AT: https://github.com/KiLLeRRaT/mikrotik-cloudflare-dns
+
+
 :global mcdPreviousIP;
 
 :local mcdCurrentIP
@@ -31,27 +64,27 @@ cat <<'EOT'
 }
 
 :if ($mcdCurrentIP != $mcdPreviousIP) do={
-  :log info "mcd: new IP $mcdCurrentIP (was $mcdPreviousIP)"
-  :set mcdPreviousIP $mcdCurrentIP
+	:log info "mcd: new IP $mcdCurrentIP (was $mcdPreviousIP)"
+	:set mcdPreviousIP $mcdCurrentIP
 EOT
 
 for line in $DNS_IDS
 do
-  id=${line%:*}
-  name=${line#*:}
+	id=${line%:*}
+	name=${line#*:}
 
-  cat <<EOT
-  /tool fetch mode=https \\
-    http-method=put \\
-    url="https://$HOST/client/v4/zones/$ZONE_ID/dns_records/$id" \\
-    http-header-field="content-type: application/json,Authorization: Bearer $TOKEN" \\
-    http-data="{\"type\":\"A\",\"name\":\"$name\",\"content\":\"\$mcdCurrentIP\"}" \\
-    output=none
+	cat <<EOT
+	/tool fetch mode=https \\
+		http-method=put \\
+		url="https://$HOST/client/v4/zones/$ZONE_ID/dns_records/$id" \\
+		http-header-field="content-type: application/json,Authorization: Bearer $TOKEN" \\
+		http-data="{\"type\":\"A\",\"name\":\"$name\",\"content\":\"\$mcdCurrentIP\"}" \\
+		output=none
 EOT
 done
 
 cat <<EOT
 } else={
-  :log info "Cloudflare DNS: No changes necessary."
+	:log info "Cloudflare DNS: No changes necessary."
 }
 EOT
