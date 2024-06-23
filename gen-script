@@ -2,6 +2,7 @@
 set -e
 
 HOST=api.cloudflare.com
+GIT_DESC=$(git describe --tags --dirty)
 
 while [ "$1" != "" ]; do
 	case $1 in
@@ -46,12 +47,15 @@ function dns_ids() {
 
 DNS_IDS=`dns_ids`
 
+echo "# Version: $GIT_DESC"
+echo "# Repo: https://github.com/KiLLeRRaT/mikrotik-cloudflare-dns"
+
 cat <<'EOT'
+
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
-# GENERATED LOCATED AT: https://github.com/KiLLeRRaT/mikrotik-cloudflare-dns
 
 # NEED THE FOLLOWING PERMISSIONS: read,write,policy,sniff,test
 
@@ -89,6 +93,7 @@ cat <<EOT
 	:log info "Cloudflare DNS: No changes necessary."
 }
 
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
