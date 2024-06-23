@@ -53,17 +53,14 @@ cat <<'EOT'
 # DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 # GENERATED LOCATED AT: https://github.com/KiLLeRRaT/mikrotik-cloudflare-dns
 
+# NEED THE FOLLOWING PERMISSIONS: read,write,policy,sniff,test
 
 :global mcdPreviousIP;
 
 :local mcdCurrentIP
-# :set mcdCurrentIP [/ip cloud get public-address] # THIS IS BLANK ON A FEW OF MY ROUTERS... USING
-# NEW METHOD BELOW
 :set mcdCurrentIP [:resolve myip.opendns.com server=208.67.222.222];
 
-# :if ($mcdCurrentIP = "") do={
 :if ([ :typeof $mcdCurrentIP ] = "nothing") do={
-# :if ([ :typeof $mcdCurrentIP] = "nothing" ]) do={
 	:log error "Cloudflare DNS: IP Cloud public address is blank!!!"
 }
 
@@ -91,4 +88,9 @@ cat <<EOT
 } else={
 	:log info "Cloudflare DNS: No changes necessary."
 }
+
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
+# DO NOT JUST COPY THIS SINCE YOU NEED A SPECIAL ID GUID, USE THE GENERATOR!
 EOT
